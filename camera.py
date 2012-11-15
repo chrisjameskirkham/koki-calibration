@@ -16,6 +16,10 @@ class Camera(object):
         self.dev_path = dev_path
         self.details = SR_CAMERAS.get(self.id, None)
 
+    def __repr__(self):
+        fmt = "Camera '{c.details.name}' {c.id} on '{c.dev_path}'"
+        return fmt.format(c=self)
+
 
 def find_cameras(just_sr_cams=True):
     context = pyudev.Context()
