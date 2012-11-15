@@ -37,3 +37,26 @@ def find_cameras(just_sr_cams=True):
         cameras.append(Camera(int(vendor, 16), int(product, 16), dev_path))
 
     return filter(lambda c: not just_sr_cams or c.id in SR_CAMERAS, cameras)
+
+
+def choose_camera():
+    cam = None
+    cameras = find_cameras()
+    if cameras == []:
+        return None
+
+    if len(cameras) == 1:
+        cam = cameras[0]
+    else:
+        print "Choose a camera:"
+        fmt = "  [{i}]  '{c.details.name}' on '{c.dev_path}'"
+        for i in range(len(cameras)):
+            print fmt.format(i=i, c=cameras[i])
+
+        try:
+            inp = int(raw_input('>> '))
+            if inp < len(cameras):
+                cam = cameras[inp]
+        except:
+            pass
+    return cam
