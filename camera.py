@@ -2,11 +2,11 @@ import pyudev
 import re
 from collections import namedtuple
 
-CameraDetails = namedtuple('CameraDetails', ['name'])
+CameraDetails = namedtuple('CameraDetails', ['name', 'short_name'])
 
 DEV_PATH_RE = re.compile(".*video4linux/(video[0-9]+)$")
-SR_CAMERAS = {(0x046d, 0x0807): CameraDetails('Logitech C500'),
-              (0x046d, 0x0825): CameraDetails('Logitech C270')}
+SR_CAMERAS = {(0x046d, 0x0807): CameraDetails('Logitech C500', 'C500'),
+              (0x046d, 0x0825): CameraDetails('Logitech C270', 'C270')}
 
 class Camera(object):
     def __init__(self, id_vendor, id_product, dev_path):
