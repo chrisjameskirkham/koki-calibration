@@ -10,8 +10,8 @@
 int main(int argc, const char* argv[])
 {
 
-	if (argc != 5){
-		printf("USAGE: %s <device> <filename> <width> <height>\n", argv[0]);
+	if (argc < 5){
+		printf("USAGE: %s <device> <filename> <width> <height> [<wait>]\n", argv[0]);
 		return 1;
 	}
 
@@ -19,6 +19,11 @@ int main(int argc, const char* argv[])
 	const char *filename = argv[2];
 	float width = atof(argv[3]);
 	float height = atof(argv[4]);
+
+	int wait = 0;
+	if (argc == 6){
+		wait = atoi(argv[5]);
+	}
 
 	int fd = koki_v4l_open_cam(device);
 	struct v4l2_format fmt = koki_v4l_create_YUYV_format(width, height);
@@ -29,6 +34,11 @@ int main(int argc, const char* argv[])
 	buffers = koki_v4l_prepare_buffers(fd, &num_buffers);
 
 	koki_v4l_start_stream(fd);
+
+	if (wait){
+		fprintf(stderr, "Press [ENTER] to take photo...\n");
+		getchar();
+	}
 
 	uint8_t *yuyv = koki_v4l_get_frame_array(fd, buffers);
 	IplImage *frame = koki_v4l_YUYV_frame_to_grayscale_image(yuyv, width, height);

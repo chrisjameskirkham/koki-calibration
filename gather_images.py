@@ -10,7 +10,7 @@ CAM_RES_DIR_FMT = "{prefix}/{cam}/{res}/{dist}"
 BASENAME_FMT = "{i:03d}.jpg"
 
 
-def _take_photo(camera, resolution, distance, prefix='images'):
+def _take_photo(camera, resolution, distance, prefix='images', wait=True):
     opts = {'prefix': prefix,
             'cam'   : camera.details.short_name,
             'res'   : "{0}x{1}".format(*resolution),
@@ -27,9 +27,16 @@ def _take_photo(camera, resolution, distance, prefix='images'):
 
     filename = cam_res_dir + '/' + BASENAME_FMT.format(i=i)
 
-    p = subprocess.call(['./take_photo', camera.dev_path, filename,
-                         str(resolution[0]), str(resolution[1])])
-
+    print "Taking photo:", camera.details.short_name, resolution, distance
+    p = subprocess.Popen(['./take_photo', camera.dev_path, filename,
+                          str(resolution[0]), str(resolution[1]),
+                          "1" if wait else "0"],
+                         stderr=subprocess.PIPE, stdout=subprocess.PIPE,
+                         stdin=subprocess.PIPE)
+    if wait:
+        raw_input('Press [ENTER] to take photo...')
+        p.communicate('boo')
+    p.wait()
 
 def photos_for_all_distances(camera, resolution, prefix='images'):
     for distance in DESIRED_DISTANCES:
