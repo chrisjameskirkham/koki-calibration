@@ -31,6 +31,14 @@ def _take_photo(camera, resolution, distance, prefix='images'):
                          str(resolution[0]), str(resolution[1])])
 
 
+def photos_for_all_distances(camera, resolution, prefix='images'):
+    for distance in DESIRED_DISTANCES:
+        _take_photo(camera, resolution, distance, prefix=prefix)
+
+
+def photos_for_all_resolutions(camera, prefix='images'):
+    for resolution in camera.details.resolutions:
+        photos_for_all_distances(camera, resolution, prefix=prefix)
 
 
 
