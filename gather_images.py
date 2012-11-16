@@ -27,7 +27,10 @@ def _take_photo(camera, resolution, distance, prefix='images', wait=True):
 
     filename = cam_res_dir + '/' + BASENAME_FMT.format(i=i)
 
+    print
     print "Taking photo:", camera.details.short_name, resolution, distance
+    print "Please place a marker perpendicular to the direction the camera"
+    print "is pointing in and {d} away...".format(d=distance)
     p = subprocess.Popen(['./take_photo', camera.dev_path, filename,
                           str(resolution[0]), str(resolution[1]),
                           "1" if wait else "0"],
@@ -37,6 +40,7 @@ def _take_photo(camera, resolution, distance, prefix='images', wait=True):
         raw_input('Press [ENTER] to take photo...')
         p.communicate('boo')
     p.wait()
+    print "Photo", filename, "taken"
 
 def photos_for_all_distances(camera, resolution, prefix='images'):
     for distance in DESIRED_DISTANCES:
