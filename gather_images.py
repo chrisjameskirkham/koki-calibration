@@ -3,9 +3,9 @@ import subprocess
 import glob
 import os
 
-DESIRED_DISTANCES = ["{0:.2f}m".format(x) for x in
-                     (0.3, 0.4, 0.5, 0.75, 1.0, 1.5)]
+DESIRED_DISTANCES = [0.3, 0.4, 0.5, 0.75, 1.0]
 
+DIST_FMT = "{0:.2f}m"
 CAM_RES_DIR_FMT = "{prefix}/{cam}/{res}/{dist}"
 BASENAME_FMT = "{i:03d}.jpg"
 
@@ -14,7 +14,7 @@ def _take_photo(camera, resolution, distance, prefix='images', wait=True):
     opts = {'prefix': prefix,
             'cam'   : camera.details.short_name,
             'res'   : "{0}x{1}".format(*resolution),
-            'dist'  : distance}
+            'dist'  : DIST_FMT.format(distance)}
 
     cam_res_dir = CAM_RES_DIR_FMT.format(**opts)
 
