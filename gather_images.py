@@ -62,3 +62,4 @@ if __name__ == '__main__':
 
     print "Chosen", cam
 
+    photos_for_all_resolutions(cam)
