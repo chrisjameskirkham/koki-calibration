@@ -4,11 +4,14 @@ import glob
 import sys
 import re
 import os
+import scipy
 import pickle
 from scipy import optimize
 
 DIST_DIR_RE = re.compile(".*([0-9]+\.[0-9]+m)/?$")
 RES_DIR_RE = re.compile(".*/([0-9]+)x([0-9]+)/?$")
+
+POLYFIT_DEGREE = 1
 
 class NoMarkerFoundError(Exception):
     pass
@@ -101,6 +104,30 @@ def load_bests(short_name, prefix='images'):
     bests = pickle.load(f)
     f.close()
     return bests
+
+
+def polyfits_for_bests(bests, degree=POLYFIT_DEGREE):
+    def filter_outliers(items, chop_pc=0.2, min_points=4):
+        x, y = zip(*items)
+        y_median = scipy.median(y)
+        y_std = scipy.std(y)
+        deltas = []
+        for _x, _y in items:
+            deltas.append((_x, _y, abs(_y-y_median)))
+        deltas = sorted(deltas, key=lambda x: x[2], reverse=True)
+        n = min(len(items)-min_points, int(chop_pc*len(items)))
+        new_len = len(items) - n
+        deltas = deltas[n/2:][:new_len]
+        return map(lambda x: (x[0], x[1]), deltas)
+
+    fits = {}
+    for res in bests:
+        items = filter(lambda x: x[1] is not None, bests[res].items())
+        items = map(lambda x: (float(x[0][:-1]), x[1]), items)
+        items = filter_outliers(items, chop_pc=0.4)
+        x, y = zip(*items)
+        fits[res] = scipy.polyfit(x, y, degree)
+    return fits
 
 if __name__ == '__main__':
     print bests_for_cam('C270', 0.78)
