@@ -6,10 +6,17 @@ CameraDetails = namedtuple('CameraDetails',
                            ['name', 'short_name', 'resolutions'])
 
 DEV_PATH_RE = re.compile(".*video4linux/(video[0-9]+)$")
+
+C500_RES = [(800,600)]
+C270_RES = [(1280,960), (1280,720), (960,720), (1024,576), (960,544),
+            (800,600), (864,480), (800,448), (752,416), (640,480),
+            (544,288), (432,240), (352,288), (320,240), (320,176),
+            (176,144), (160,120)]
+
 SR_CAMERAS = {(0x046d, 0x0807): CameraDetails('Logitech C500', 'C500',
-                                              [(800,600)]),
+                                              C500_RES),
               (0x046d, 0x0825): CameraDetails('Logitech C270', 'C270',
-                                              [(800,600)])}
+                                              C270_RES)}
 
 
 class Camera(object):
