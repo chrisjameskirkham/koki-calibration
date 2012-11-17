@@ -7,6 +7,7 @@ import os
 import scipy
 import pickle
 from scipy import optimize
+from collections import OrderedDict
 
 DIST_DIR_RE = re.compile(".*([0-9]+\.[0-9]+m)/?$")
 RES_DIR_RE = re.compile(".*/([0-9]+)x([0-9]+)/?$")
@@ -130,6 +131,14 @@ def best_focal_length_for_res(fits, resolution, distance_hint=0.5):
     return scipy.polyval(fits[resolution], distance_hint)
 
 
+def focal_length_lut(fits, distance_hint=0.5):
+    lut = OrderedDict()
+    for res in reversed(sorted(fits.keys())):
+        fl = best_focal_length_for_res(fits, res, distance_hint=distance_hint)
+        lut[res] = (fl, fl)
+    return lut
+
+
 def plot_bests(bests):
     import pylab
     import math
@@ -164,4 +173,10 @@ def plot_bests(bests):
 
 
 if __name__ == '__main__':
-    print bests_for_cam('C270', 0.78)
+    #bests = bests_for_cam('C270', 0.083)
+    #save_bests(bests, 'C270')
+    bests = load_bests('C270')
+    fits = polyfits_for_bests(bests)
+    lut = focal_length_lut(fits, distance_hint=0.2)
+    print lut
+    print lut[(800,600)]
