@@ -9,6 +9,9 @@ from scipy import optimize
 DIST_DIR_RE = re.compile(".*([0-9]+\.[0-9]+m)/?$")
 RES_DIR_RE = re.compile(".*/([0-9]+)x([0-9]+)/?$")
 
+class NoMarkerFoundError(Exception):
+    pass
+
 _ignore_cache = set()
 
 def dist_at_focal_length(filename, focal_length, marker_width):
@@ -43,6 +46,8 @@ def best_for_dist_dir(directory, marker_width):
 
     def error_func(focal_length):
         actual = average_for_dist_dir(directory, focal_length, marker_width)
+        if actual is None:
+            raise NoMarkerFoundError()
         perc_error = (actual-expected)/expected
         return perc_error ** 2
 
@@ -54,7 +59,11 @@ def bests_for_res_dir(directory, marker_width):
     bests = {}
     for distance in distances:
         d = DIST_DIR_RE.match(distance).groups()[0]
-        bests[d] = best_for_dist_dir(distance, marker_width)
+        try:
+            bests[d] = best_for_dist_dir(distance, marker_width)
+        except NoMarkerFoundError:
+            bests[d] = None
+            print >>sys.stderr, "No marker found for", distance, "in", directory
     return bests
 
 
