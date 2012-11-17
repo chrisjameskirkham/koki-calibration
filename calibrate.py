@@ -55,11 +55,7 @@ def best_for_dist_dir(directory, marker_width):
         perc_error = (actual-expected)/expected
         return perc_error ** 2
 
-    # Golden section search sometimes returns negative values due
-    # to the way it searches.  This is not a problem as a negative
-    # focal length will yield the same result as it's positive
-    # counterpart.
-    return abs(optimize.golden(error_func, brack=(250.0, 750.0)))
+    return optimize.fminbound(error_func, 10, 5000)
 
 
 def bests_for_res_dir(directory, marker_width):
