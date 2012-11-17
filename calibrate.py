@@ -4,6 +4,7 @@ import glob
 import sys
 import re
 import os
+import pickle
 from scipy import optimize
 
 DIST_DIR_RE = re.compile(".*([0-9]+\.[0-9]+m)/?$")
@@ -75,7 +76,10 @@ def bests_for_cam_dir(directory, marker_width):
     resolutions = glob.glob(directory + '/*')
     bests = {}
     for resolution in resolutions:
-        r = RES_DIR_RE.match(resolution).groups()
+        match = RES_DIR_RE.match(resolution)
+        if match is None:
+            continue
+        r = match.groups()
         bests[(int(r[0]), int(r[1]))] = bests_for_res_dir(resolution, marker_width)
     return bests
 
@@ -87,6 +91,16 @@ def bests_for_cam(short_name, marker_width, prefix='images'):
     return bests_for_cam_dir(cam_dir, marker_width)
 
 
+def save_bests(bests, short_name, prefix='images'):
+    with open(prefix + '/' + short_name + '/bests.pickle', 'w') as f:
+        pickle.dump(bests, f)
+
+
+def load_bests(short_name, prefix='images'):
+    f = open(prefix + '/' + short_name + '/bests.pickle')
+    bests = pickle.load(f)
+    f.close()
+    return bests
 
 if __name__ == '__main__':
     print bests_for_cam('C270', 0.78)
