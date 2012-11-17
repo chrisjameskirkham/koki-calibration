@@ -1,4 +1,4 @@
-from gather_images import CAM_RES_DIR_FMT, BASENAME_FMT
+from gather_images import CAM_RES_DIR_FMT, BASENAME_FMT, DESIRED_DISTANCES
 import subprocess
 import glob
 import sys
@@ -132,6 +132,40 @@ def polyfits_for_bests(bests, degree=POLYFIT_DEGREE):
 
 def best_focal_length_for_res(fits, resolution, distance_hint=0.5):
     return scipy.polyval(fits[resolution], distance_hint)
+
+
+def plot_bests(bests):
+    import pylab
+    import math
+    w = math.ceil(len(bests.keys()) ** 0.5)
+    pylab.figure(figsize=(w, w))
+    fits = polyfits_for_bests(bests)
+
+    count = 0
+    for res in sorted(bests.keys(), reverse=True):
+        count += 1
+        X, Y = [], []
+        pylab.subplot(w, w, count)
+        sorted_items = sorted(map(lambda x: (float(x[0][:-1]), x[1]),
+                                  bests[res].items()))
+        for x, y in sorted_items:
+            if y is None:
+                continue
+            X.append(x)
+            Y.append(y)
+        pylab.scatter(X, Y, label=str(res))
+
+        m, c = fits[res]
+        X = [0, max(DESIRED_DISTANCES)]
+        Y = map(lambda x: c + m*x, X)
+        pylab.plot(X, Y)
+        pylab.title(str(res))
+        pylab.ylim([0, 2000])
+        pylab.xlim(X)
+
+    pylab.subplots_adjust(hspace=0.5, wspace=0.4)
+    pylab.show()
+
 
 if __name__ == '__main__':
     print bests_for_cam('C270', 0.78)
