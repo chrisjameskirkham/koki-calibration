@@ -129,5 +129,9 @@ def polyfits_for_bests(bests, degree=POLYFIT_DEGREE):
         fits[res] = scipy.polyfit(x, y, degree)
     return fits
 
+
+def best_focal_length_for_res(fits, resolution, distance_hint=0.5):
+    return scipy.polyval(fits[resolution], distance_hint)
+
 if __name__ == '__main__':
     print bests_for_cam('C270', 0.78)
