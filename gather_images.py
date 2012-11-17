@@ -42,16 +42,17 @@ def _take_photo(camera, resolution, distance, prefix='images', wait=True):
     p.wait()
     print "Photo", filename, "taken"
 
-def photos_for_all_distances(camera, resolution, prefix='images'):
-    for distance in DESIRED_DISTANCES:
-        _take_photo(camera, resolution, distance, prefix=prefix)
 
-
-def photos_for_all_resolutions(camera, prefix='images'):
+def photos_for_distance_for_all_resolutions(camera, distance, prefix='images'):
+    wait = True
     for resolution in camera.details.resolutions:
-        photos_for_all_distances(camera, resolution, prefix=prefix)
+        _take_photo(camera, resolution, distance, prefix=prefix, wait=wait)
+        wait = False
 
 
+def photos_for_all_distances_for_all_resolutions(camera, prefix='images'):
+    for distance in DESIRED_DISTANCES:
+        photos_for_distance_for_all_resolutions(camera, distance, prefix=prefix)
 
 
 if __name__ == '__main__':
@@ -62,4 +63,4 @@ if __name__ == '__main__':
 
     print "Chosen", cam
 
-    photos_for_all_resolutions(cam)
+    photos_for_all_distances_for_all_resolutions(cam)
